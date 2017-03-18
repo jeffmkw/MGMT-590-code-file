@@ -1,0 +1,144 @@
+---
+title: "AS2 Kewa Mei, Jianing Hu"
+output: html_notebook
+---
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+```{r}
+#import data and create the log
+q1 = read.csv("/Users/Jeffery/Google Drive/Homework/web data 590/As2/GlobalMobileAppsExercise.csv",sep=',',header = T)
+q1$sales = 1/q1$rank
+q1$lprice = log(1+q1$price)
+q1$lsales = log(q1$sales)
+q1$lfilesize = log(q1$filesize)
+q1$lrank = log(q1$rank)
+summary(q1)
+```
+
+```{r}
+q1m1 = lm(lsales~lprice+region+app_store+filesize+in_app_ads+in_app_purchase+category+num_screenshot, data = q1)
+summary(q1m1) 
+```
+
+```{r}
+q1m3 = lm(lsales~in_app_ads*in_app_purchase,data = q1)
+summary(q1m3)
+```
+
+```{r}
+#us vs china
+q1m4a = lm(lsales~region, data=q1)
+summary(q1m4a)
+```
+```{r}
+#b tablets vs smart phone
+q1m4b = lm(lsales~device,data = q1)
+summary(q1m4b)
+```
+
+```{r}
+#c.	apple vs google 
+q1m4c = lm(lsales~app_store, data = q1)
+summary(q1m4c)
+```
+
+```{r}
+#d.	free vs paid apps
+q1m4d = lm(lsales~app_type,data = q1)
+summary(q1m4d)
+```
+
+```{r}
+#question 2
+q2 = read.csv('/Users/Jeffery/Google Drive/Homework/web data 590/As2/KNOW.csv',sep = ',', header = T)
+```
+
+```{r}
+boxplot(q2$Spend~q2$Segment,main = 'Spend by Segment', ylab = 'Spend', xlab='segment')
+```
+
+```{r}
+sitea = q2[q2$Segment=='NEW_A',]
+siteold = q2[q2$Segment=='OLD',]
+siteb = q2[q2$Segment=='NEW_B',]
+t.test(sitea$Spend,siteold$Spend,alternative = "greater")
+t.test(sitea$Spend,siteb$Spend,alternative = "greater")
+
+```
+
+```{r}
+#Question 3
+q3 = read.csv('/Users/Jeffery/Google Drive/Homework/web data 590/As2/Assignment2PurchaseData.csv',sep = ',', header = T)
+hist(q3$quant)
+summary(q3$quant)
+boxplot((q3$quant))
+#on average 4 itesm were perchased from the catalog channel, but his high number was due to the high amount for some specifi items. Most of the items have little or no sales.
+```
+
+```{r}
+cor(q3$best,q3$quant)
+scatter.smooth(y = q3$quant,x = q3$best)
+# the result shows that whether the customer is a best customers is not likely to have relationship with the quantity he purchased
+```
+
+```{r}
+#iii
+cor(q3$best,q3$highadvertising)
+scatter.smooth(y = q3$quant,x = q3$highadvertising)
+# the result shows that whether the customer recived the total 17 catelogs has almost no relationship with the quantity he purchased.
+```
+
+```{r}
+#iv
+cusgood = q3[q3$good==1,]
+cusbest = q3[q3$best==1,]
+t.test(cusbest$quant, cusgood$quant, alternative = 'greater')
+t.test(cusbest$rev, cusgood$rev, alternative = 'greater')
+t.test(cusbest$quantint, cusgood$quantint, alternative = 'greater')
+t.test(cusbest$revint, cusgood$revint, alternative = 'greater')
+t.test(cusbest$quantcat, cusgood$quantcat, alternative = 'greater')
+t.test(cusbest$revcat, cusgood$revcat, alternative = 'greater')
+# all the result shows that best customers purchase more at a higher value on both catlog channel and internat channel
+```
+
+```{r}
+#v
+m3v = lm(q3$rev~q3$highadvertising)
+summary(m3v)
+#sending 17 catalogs will increase the dollar amount by $18.8
+
+```
+
+```{r}
+#v
+m3vb = lm(rev~highadvertising*best, data = q3)
+summary(m3vb)
+#the difference on effect of sending all 17 catalogs to two different groups is not significant。
+```
+
+```{r}
+#vi
+m3vi = lm(q3$rev~q3$highadvertising*q3$pretintuser)
+summary(m3vi)
+#the answer changed for highadvertis
+```
+
+```{r}
+#vi
+m3vib = lm(rev~highadvertising*best*pretintuser, data = q3)
+summary(m3vib)
+#the answer does change
+```
+
+```{r}
+#vi
+intuser = q3[q3$pretintuser==1,]
+t.test(intuser$revint,intuser$revcat,alternative = 'greater')
+hist(intuser$revint)
+hist(intuser$revcat)
+#we fail to reject the hypothsis that the internet users are spending similar amount on internet and catlog. 
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file).
